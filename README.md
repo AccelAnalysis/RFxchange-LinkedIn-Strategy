@@ -5,7 +5,8 @@ Version-controlled operating system for RFxchange LinkedIn acquisition, ecosyste
 ## Current baseline
 
 - **Organizations:** 73
-- **LinkedIn pages already followed:** 73
+- **LinkedIn pages followed:** 72
+- **No LinkedIn organization page:** 1 — Currituck County Economic Development
 - **P0:** 28
 - **P1:** 37
 - **P2:** 8
@@ -13,63 +14,52 @@ Version-controlled operating system for RFxchange LinkedIn acquisition, ecosyste
 - **Near:** 33
 - **Edge:** 13
 - **Regional Overlay:** 15
-- **Baseline date:** August 14, 2026
+
+## Stable identity model
+
+Organizations use an immutable `Organization ID` (`RFX-ORG-####`) as the primary key. People and correction records link by that ID rather than organization-name text. Organization names can therefore be corrected or changed without breaking relationships.
+
+People use immutable `Person ID` values (`RFX-PER-######`).
 
 ## Repository structure
 
-- `data/organizations.csv` — **canonical master list** and source of truth.
+- `data/organizations.csv` — canonical organization master list.
+- `data/people.csv` — canonical person-level LinkedIn acquisition tracker.
+- `data/organization-corrections.csv` — verified organization-status corrections.
 - `data/metadata.json` — dataset metadata.
 - `docs/taxonomy.md` — organization taxonomy, RFxchange roles, priorities, and geographic rings.
-- `scripts/validate_data.py` — schema and data-quality validator.
-- `scripts/export_json.py` — creates a machine-readable JSON export from the canonical CSV.
-- `.github/workflows/data-validation.yml` — validates tracker integrity on pushes and pull requests.
+- `docs/people-tracking.md` — person-level tracking and identity model.
+- `scripts/sync_rollups.py` — applies corrections and rolls person activity into organization counters.
+- `scripts/validate_data.py` — schema, identity, foreign-key, and data-quality validator.
+- `scripts/export_json.py` — machine-readable JSON export.
 - `AGENTS.md` — rules for future AI/agent updates.
 
-## Master-list schema
+## Organization master schema
 
-The canonical dataset preserves these 19 fields:
+`Organization ID | Organization | Locality | State | Geographic Ring | Taxonomy Code | RFxchange Roles | Priority | LinkedIn Page | Page Followed | Employee/Follower Population | Target Titles | People Identified | Invites Sent | Follows Gained | Partnership Contact | Resource Verified | Opportunity Source | RFxchange Registrations | Notes`
 
-`Organization | Locality | State | Geographic Ring | Taxonomy Code | RFxchange Roles | Priority | LinkedIn Page | Page Followed | Employee/Follower Population | Target Titles | People Identified | Invites Sent | Follows Gained | Partnership Contact | Resource Verified | Opportunity Source | RFxchange Registrations | Notes`
+## Person tracker schema
 
-## Operating model
+`Person ID | Organization ID | Person Name | Current Title | Target Title Match | LinkedIn Profile | Connection Degree | Identified Date | Invite Eligible | Invite Sent | Invite Date | Follows RFxchange | Follow Confirmed Date | Direct Outreach Status | Last Contact Date | Partnership Contact | Resource Contact | Opportunity Contact | RFxchange Registered | Registration Date | Last Verified | Notes`
 
-The strategy tracks four overlapping acquisition functions:
+## Updating people
 
-1. **Acquire** — organizations/people likely to become RFxchange users.
-2. **Supply** — organizations that can create opportunities, purchasing demand, referrals, or teaming activity.
-3. **Amplify** — organizations with networks/audiences that can extend RFxchange reach.
-4. **Validate** — organizations whose participation increases legitimacy and trust.
-
-Resource, Capital, Teaming, and Partnership roles are also captured where appropriate.
-
-## Updating the tracker
-
-`data/organizations.csv` is authoritative. Future ChatGPT/GitHub updates should edit that file rather than maintaining a separate spreadsheet copy.
-
-After editing it, run:
+Add identified individuals to `data/people.csv` using the organization's immutable `Organization ID`. Then run:
 
 ```bash
+python scripts/sync_rollups.py --write
 python scripts/validate_data.py
-python scripts/export_json.py --output /tmp/organizations.json
 ```
 
-The GitHub Actions workflow checks that the 19-column schema remains intact, campaign counters are valid, priority/ring/taxonomy values are supported, LinkedIn URLs are structurally valid, and duplicate organization/locality/state records are not introduced.
+GitHub automation also synchronizes organization rollups after changes to `people.csv` or `organization-corrections.csv`.
 
-## Campaign baseline
+The funnel is:
 
-Every organization in the initial dataset is marked **Page Followed = Yes**, based on the campaign status provided by the owner. Outreach and conversion counters begin at observed baseline values rather than fabricated activity.
-
-Future updates should record actual progress through:
-
-**Page followed → people identified → invitations sent → follows gained → partnership/resource relationship → RFxchange registration**
+**Page followed → people identified → invitations sent → follows gained → partnership/resource/opportunity relationship → RFxchange registration**
 
 ## Geographic strategy
-
-The initial market is organized as operating acquisition rings centered on Isle of Wight County:
 
 - **Core** — Isle of Wight and immediate adjoining market.
 - **Near** — broader Hampton Roads / Historic Triangle.
 - **Edge** — western Virginia and northeast North Carolina localities in the practical ~50-mile market shed.
 - **Regional Overlay** — organizations serving multiple rings.
-
-These are strategic operating bands. A later geocoding pass can convert them into precise mileage/boundary calculations.
