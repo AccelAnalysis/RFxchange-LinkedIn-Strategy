@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Synchronize organization-level acquisition rollups from stable-ID person records."""
 import argparse
 import csv
 import json
