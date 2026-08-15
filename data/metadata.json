@@ -1,0 +1,13 @@
+{
+  "project": "RFxchange LinkedIn Acquisition Strategy",
+  "canonical_file": "data/organizations.csv",
+  "schema_version": "1.0",
+  "record_count": 73,
+  "page_followed_yes": 73,
+  "baseline_date": "2026-08-14",
+  "origin_market": "Isle of Wight County, Virginia",
+  "operating_radius": "approximately 50 miles / practical market shed",
+  "geographic_ring_counts": {"Core": 12, "Near": 33, "Edge": 13, "Regional Overlay": 15},
+  "priority_counts": {"P0": 28, "P1": 37, "P2": 8},
+  "notes": "Geographic rings are operational acquisition bands, not survey-grade geospatial calculations."
+}

@@ -9,22 +9,20 @@ Version-controlled operating system for RFxchange LinkedIn acquisition, ecosyste
 - **P0:** 28
 - **P1:** 37
 - **P2:** 8
-- **Core:** 19
-- **Near:** 34
-- **Edge:** 17
-- **Regional Overlay:** 3
+- **Core:** 12
+- **Near:** 33
+- **Edge:** 13
+- **Regional Overlay:** 15
 - **Baseline date:** August 14, 2026
 
 ## Repository structure
 
 - `data/organizations.csv` — **canonical master list** and source of truth.
-- `data/organizations.json` — machine-readable mirror generated from the CSV.
-- `data/source-verification.csv` — LinkedIn/source verification history from the initial build.
 - `data/metadata.json` — dataset metadata.
 - `docs/taxonomy.md` — organization taxonomy, RFxchange roles, priorities, and geographic rings.
-- `scripts/validate_data.py` — schema/data validator and CSV→JSON synchronizer.
+- `scripts/validate_data.py` — schema and data-quality validator.
+- `scripts/export_json.py` — creates a machine-readable JSON export from the canonical CSV.
 - `.github/workflows/data-validation.yml` — validates tracker integrity on pushes and pull requests.
-- `exports/RFxchange_LinkedIn_Acquisition_Master_List.xlsx` — baseline Excel workbook.
 - `AGENTS.md` — rules for future AI/agent updates.
 
 ## Master-list schema
@@ -46,16 +44,16 @@ Resource, Capital, Teaming, and Partnership roles are also captured where approp
 
 ## Updating the tracker
 
-`data/organizations.csv` is authoritative.
+`data/organizations.csv` is authoritative. Future ChatGPT/GitHub updates should edit that file rather than maintaining a separate spreadsheet copy.
 
 After editing it, run:
 
 ```bash
-python scripts/validate_data.py --write-json
 python scripts/validate_data.py
+python scripts/export_json.py --output /tmp/organizations.json
 ```
 
-The GitHub Actions workflow checks that the 19-column schema remains intact, campaign counters are valid, priority/ring/taxonomy values are supported, and the JSON mirror matches the canonical CSV.
+The GitHub Actions workflow checks that the 19-column schema remains intact, campaign counters are valid, priority/ring/taxonomy values are supported, LinkedIn URLs are structurally valid, and duplicate organization/locality/state records are not introduced.
 
 ## Campaign baseline
 

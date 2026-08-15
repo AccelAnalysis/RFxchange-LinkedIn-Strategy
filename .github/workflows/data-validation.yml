@@ -1,0 +1,29 @@
+name: Validate acquisition data
+
+on:
+  push:
+    paths:
+      - "data/**"
+      - "scripts/**"
+      - ".github/workflows/data-validation.yml"
+  pull_request:
+    paths:
+      - "data/**"
+      - "scripts/**"
+      - ".github/workflows/data-validation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate canonical master list
+        run: python scripts/validate_data.py
+      - name: Verify JSON export path
+        run: python scripts/export_json.py --output /tmp/organizations.json
