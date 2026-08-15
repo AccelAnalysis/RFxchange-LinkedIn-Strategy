@@ -95,3 +95,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+# Migration trigger: 2026-08-15 stable-key upgrade
